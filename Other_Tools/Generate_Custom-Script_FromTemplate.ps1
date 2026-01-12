@@ -15,6 +15,7 @@ It can technically create custom scripts from any template script, but it's prim
 param(
     [string]$RepoNickName,
     [string]$RepoUrl,
+    [string]$RepoBranch,
     [string]$WorkingDirectory,
     [string]$ScriptPath,
     #[hashtable]$ScriptParams,
@@ -34,6 +35,7 @@ $OldRepoNickName = $RepoNickName
 
 $RepoNickName = "'" +    $RepoNickName + "'"
 $RepoUrl = "'" +    $RepoUrl + "'"
+$RepoBranch = "'" +    $RepoBranch + "'"
 $WorkingDirectory = "'" +    $WorkingDirectory + "'"
 $ScriptPath = "'" +    $ScriptPath + "'"
 $ScriptParamsBase64 = "'" +    $ScriptParamsBase64 + "'"
@@ -57,6 +59,19 @@ $GitRunnerScript = "$RepoRoot\Templates\Git-Runner_TEMPLATE.ps1"
 $PrinterDetectionScript = "$RepoRoot\Templates\Detection-Script-Printer_TEMPLATE.ps1"
 $WinGetDetectionScript = "$RepoRoot\Templates\Detection-Script-WinGetApp_TEMPLATE.ps1"
 
+
+Write-Host "SCRIPT: $ThisFileName | START" -ForegroundColor Yellow
+Write-Host ""
+# Output all vars to command line for debugging
+Write-Host "`n--- Input Parameters ---`n"
+Foreach ($var in $PSBoundParameters.GetEnumerator()) {
+    Write-Host "$($var.Key): $($var.Value)"
+}
+Write-Host "`n--- End Input Parameters ---`n"
+Write-Host ""
+
+# Main 
+
 if ($TemplateScript -eq "GitRunnerScript"){
     
     #$GitRunnerScript = "$RepoRoot\Templates\Git-Runner_TEMPLATE.ps1"
@@ -66,6 +81,7 @@ if ($TemplateScript -eq "GitRunnerScript"){
 
     $RepoNickName_DEC = '$RepoNickName = '+$RepoNickName
     $RepoUrl_DEC = '$RepoUrl = '+$RepoUrl
+    $RepoBranch_DEC = '$RepoBranch = '+$RepoBranch
     $WorkingDirectory_DEC = '$WorkingDirectory = '+$WorkingDirectory
     $ScriptPath_DEC = '$ScriptPath = '+$ScriptPath
     $ScriptParamsBase64_DEC = '$ScriptParamsBase64 = '+$ScriptParamsBase64
@@ -78,6 +94,7 @@ $NewCode      = @"
 
     $RepoNickName_DEC
     $RepoUrl_DEC
+    $RepoBranch_DEC
     $WorkingDirectory_DEC
     $ScriptPath_DEC
     $ScriptParamsBase64_DEC

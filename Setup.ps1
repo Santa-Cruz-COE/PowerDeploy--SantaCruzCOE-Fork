@@ -290,23 +290,23 @@ Function Set-URL {
     # Write-Log "2 - PRODUCTION MODE: The resulting InTune application will utilize your organization's custom repository for PowerDeploy. Target URL: $CustomRepoURL"
     Write-Log ""
     Write-Log "1 - [PUBLIC-DEVELOPMENT]:" 
-    Write-Log "     - Uses official public PowerDeploy repo (DEV branch)" 
     Write-Log "     - For TESTING purposes."
+    Write-Log "     - Uses official public PowerDeploy repo (DEV branch)" 
     Write-Log ""
 
     Write-Log "2 - [PUBLIC-TESTING]:"
-    Write-Log "     - Uses official public PowerDeploy repo (MAIN branch)"
     Write-Log "     - For TESTING purposes."
+    Write-Log "     - Uses official public PowerDeploy repo (MAIN branch)"
     Write-Log ""
 
     Write-Log "3 - [PRIVATE-DEVELOPMENT]:"
-    Write-Log "     - Uses your organization's custom PowerDeploy repository (DEV branch)"
     Write-Log "     - For TESTING purposes."
+    Write-Log "     - Uses your organization's custom PowerDeploy repository (DEV branch)"
     Write-Log ""
 
     Write-Log "4 - [PRODUCTION]:"
-    Write-Log "     - Uses your organization's custom PowerDeploy repository (MAIN branch)"
     Write-Log "     - For PRODUCTION deployments."
+    Write-Log "     - Uses your organization's custom PowerDeploy repository (MAIN branch)"
     Write-Log ""
 
     $modeSelected = $false
@@ -364,16 +364,18 @@ Function Set-URL {
 
         if ($modeSelected1) {
 
-            $Global:TargetRepoNickName = "PowerDeploy-Repo--$Global:DeployMode"
-            $Global:TargetWorkingDirectory = "C:\ProgramData\PowerDeploy\$Global:TargetRepoNickName"
+            $Global:ProgamDataFolderName = "PowerDeploy--$Global:DeployMode"
+            #$Global:TargetRepoNickName = "PowerDeploy-Repo--$Global:DeployMode"
+            $Global:TargetRepoNickName = "PowerDeploy-Repo"
+            $Global:TargetWorkingDirectory = "C:\ProgramData\$Global:ProgamDataFolderName"
 
             Write-Log "You have selected the following:"
             Write-Log ""
-            Write-Log " Target Deployment mode: $Global:DeployMode"
-            Write-Log " Target Repo URL set to: $RepoUrl"
-            Write-Log " Using branch: $Global:RepoBranch"
-            Write-Log " Target Local Repo Nickname set to: $Global:TargetRepoNickName"
-            Write-Log " Target Local Working Directory set to: $Global:TargetWorkingDirectory"
+            Write-Log " Target Deployment mode:                 $Global:DeployMode"
+            Write-Log " Target Repo URL set to:                 $RepoUrl"
+            Write-Log " Target Repo branch:                     $Global:RepoBranch"
+            Write-Log " Target Local Repo Nickname set to:      $Global:TargetRepoNickName"
+            Write-Log " Target Local Working Directory set to:  $Global:TargetWorkingDirectory"
             Write-Log ""
             Write-Log "Is this acceptable? (y/n)" "WARNING"
             $confirmation = Read-Host "(y/n)"
@@ -397,7 +399,7 @@ Function Set-URL {
     Write-Log "The end product you create will use the above repository for its scripts."
     Write-Log ""
 
-    Pause
+    #Pause
 
     Return $RepoUrl
 
@@ -3012,7 +3014,7 @@ Write-Log ""
 # Write-Log "NOTE: Instructions and required info will be in Cyan. Please note these lines."
 # Write-Log "NOTE: Progess feed and non required info will be in white. Feel free to ignore these lines." "INFO2"
 
-Pause
+# Pause
 
 # Warnings
 Write-Log ""
@@ -3020,12 +3022,12 @@ Write-Log ""
 if ($WorkingDirectory -ne "C:\ProgramData\PowerDeploy") {
     Write-Log "You are running this script from a non-standard location: $WorkingDirectory" "WARNING"
     Write-Log "This may cause permission issues with files created in the this folder. It is recommended to run this script from C:\ProgramData\PowerDeploy" "WARNING"
-    Write-Log ""
-    Write-Log "The following folders will be locked down:" "WARNING"
+    Write-Log "" "WARNING"
+    Write-Log "ATTENTION: The following folders will be locked down:" "WARNING"
     Write-Log " - $WorkingDirectory\Temp" "WARNING"
     Write-Log " - $WorkingDirectory\Logs" "WARNING"
     Write-Log " - $RepoRoot" "WARNING"
-    Write-Log ""
+    Write-Log "" "WARNING"
     Write-Log "If that is acceptable, press enter to continue." "WARNING"
     Pause
     Write-Log ""
@@ -3038,47 +3040,21 @@ If( (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdent
     -and !(([Security.Principal.WindowsIdentity]::GetCurrent().User.Value -eq 'S-1-5-18'))){ # skip block if user is System
 
     Write-Log "You are either not running this script as an administrator or as the logged in user." "ERROR"
-    Write-Log ""
+    Write-Log "" "WARNING"
     Write-Log "WinGet WILL NOT WORK PROPERLY." "WARNING"
-    Write-Log ""
+    Write-Log "" "WARNING"
     Write-Log "WinGet requires you to be running as the logged in user who is also an administrator." "WARNING"
-    Write-Log ""
+    Write-Log "" "WARNING"
     Write-Log "If this is not possible, you can still use this script to set up applications for deployment via InTune." "WARNING"
-    Write-Log ""
+    Write-Log "" "WARNING"
     Write-Log "App installs from InTune/CompanyPortal do not require the user to be an admin." "WARNING"
-    Write-Log ""
+    Write-Log "" "WARNING"
     Pause
     Write-Log ""
 
 } 
 
-# Update this repo?
-Write-Log "Would you like to update the repo to the latest version? (y/n)" "WARNING"
-$Answer = Read-Host "y/n"
-if ($Answer -ne "y" -and $Answer -ne "n") {
-    Write-Log "Invalid input. Please type 'y' to update or 'n' to skip." "ERROR"
-    $Answer = Read-Host "y/n"
-}
-
-If ($Answer -eq "y"){
-
-
-    Push-Location $RepoRoot
-
-    Write-Log "Updating local repo located at: $RepoRoot" "INFO2"
-
-    $gitOutput = git pull 2>&1
-    ForEach ($line in $gitOutput) { Write-Log "GIT: $line" } ; if ($LASTEXITCODE -ne 0) {Write-Log "++++++++++++++++++++++"; Write-Log "SCRIPT: $ThisFileName | END | Failed" "ERROR"; Exit 1 }
-    
-
-    # Write-Log "" "INFO2"
- 
-    # Write-Log "Repo updated to the latest version." "INFO2"
-     
-} 
-
-Write-Log "" "INFO2"
-
+# Grab organization custom registry values and set as local variables
 Try{
 
 # Grab organization custom registry values
@@ -3110,15 +3086,47 @@ Try{
     Exit 1
 }
 
+# Update this repo
+# TODO: This isn't working quite yet. Need to add auth too.
+<#
+Write-Log "Would you like to update the repo to the latest version? (y/n)" "WARNING"
+$Answer = Read-Host "y/n"
+if ($Answer -ne "y" -and $Answer -ne "n") {
+    Write-Log "Invalid input. Please type 'y' to update or 'n' to skip." "ERROR"
+    $Answer = Read-Host "y/n"
+}
+
+If ($Answer -eq "y"){
+
+
+    Push-Location $RepoRoot
+
+    Write-Log "Updating local repo located at: $RepoRoot" "INFO2"
+
+    $gitOutput = git pull 2>&1
+    ForEach ($line in $gitOutput) { Write-Log "GIT: $line" } ; if ($LASTEXITCODE -ne 0) {Write-Log "++++++++++++++++++++++"; Write-Log "SCRIPT: $ThisFileName | END | Failed" "ERROR"; Exit 1 }
+    
+
+    # Write-Log "" "INFO2"
+ 
+    # Write-Log "Repo updated to the latest version." "INFO2"
+     
+} 
+
+Write-Log "" "INFO2"
+#>
+
 
 
 Write-Log "" "INFO2"
 
 Write-Log ""
 Write-Log "Pre-reqs check complete."
+
 Write-Log ""
-Pause
+# Pause
 Write-Log ""
+clear
 Write-Log "================================="
 Write-Log ""
 

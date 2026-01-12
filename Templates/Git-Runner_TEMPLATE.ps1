@@ -574,40 +574,39 @@ if ($RepoBranch -ne "main") {
 
         # $gitOutput = git checkout $RepoBranch 2>&1
 
+        Write-Log "RUNNING GIT: git switch $RepoBranch"
         $gitOutput = git switch $RepoBranch 2>&1
-
         foreach ($line in $gitOutput) {
             Write-Log "GIT: $line"
         }
         
         if ($LASTEXITCODE -ne 0) {
             Write-Log "++++++++++++++++++++++"
-            Write-Log "SCRIPT: $ThisFileName | END | Failed at: git checkout $RepoBranch." "ERROR"
+            Write-Log "SCRIPT: $ThisFileName | END | Failed at: ""git switch $RepoBranch"" $RepoBranch." "ERROR"
             Exit 1            
         }
 
-
-        $gitOutput = git reset --hard HEAD
-
+        Write-Log "RUNNING GIT: git reset --hard HEAD"
+        $gitOutput = git reset --hard HEAD 2>&1
         foreach ($line in $gitOutput) {
             Write-Log "GIT: $line"
         }
         
         if ($LASTEXITCODE -ne 0) {
             Write-Log "++++++++++++++++++++++"
-            Write-Log "SCRIPT: $ThisFileName | END | Failed at: git checkout $RepoBranch." "ERROR"
+            Write-Log "SCRIPT: $ThisFileName | END | Failed at: ""git reset --hard HEAD"" $RepoBranch." "ERROR"
             Exit 1            
         }
 
-        $gitOutput = git pull
-
+        Write-Log "RUNNING GIT: git pull"
+        $gitOutput = git pull 2>&1
         foreach ($line in $gitOutput) {
             Write-Log "GIT: $line"
         }
         
         if ($LASTEXITCODE -ne 0) {
             Write-Log "++++++++++++++++++++++"
-            Write-Log "SCRIPT: $ThisFileName | END | Failed at: git checkout $RepoBranch." "ERROR"
+            Write-Log "SCRIPT: $ThisFileName | END | Failed at: ""git pull"" $RepoBranch." "ERROR"
             Exit 1            
         } else {
             Write-Log "Successfully switched to branch: $RepoBranch" "SUCCESS"
