@@ -195,13 +195,13 @@ Function CheckReg {
     Write-Log "SCRIPT: $ThisFileName | Value read from registry: $EndValue"
     Write-Log "SCRIPT: $ThisFileName | Target Value to match: $Value"
 
-    if($EndValue -eq $Value){
+    if(($EndValue -eq $Value) -or (([string]::IsNullOrEmpty($Value)) -and ([string]::IsNullOrEmpty($EndValue)))) {
 
         Write-Log "SCRIPT: $ThisFileName | Registry values match for: $line" "SUCCESS"
         # Exit 0
 
     } elseif(($EndValue -eq "KeyPath exists, but could not read value" -or $EndValue -eq "KeyPath does not exist")) {
-
+ 
         Write-Log "SCRIPT: $ThisFileName | END | Could not read target registry value: $EndValue" "WARNING"
         Exit 1
 
