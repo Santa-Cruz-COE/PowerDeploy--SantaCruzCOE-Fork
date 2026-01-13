@@ -308,7 +308,7 @@ Write-Host "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 Write-Log ""
 Write-Log "===== SCRIPT: $ThisFileName | START ====="
 Write-Log ""
-Write-Log "Function: $Function"
+Write-Log "Requested Function: $Function"
 Write-Log ""
 Write-Log "Registry Changes:"
 Write-Log ""
@@ -371,15 +371,15 @@ if ($RegistryChanges -ne "" -and $RegistryChanges -ne $null){
 
             Try {
 
-                # if ($Value -eq "" -or $Value -eq $null){
+                if ($Value -eq "" -or $Value -eq $null){
 
-                #     $EndValue = & $RegEditScriptPath -KeyPath $KeyPath -ValueName $ValueName -ValueType $ValueType -Value $Value -WorkingDirectory $WorkingDirectory -Function 'Modify' -AlsoLockDown $AlsoLockDown -ValueNameOnly $True
+                    $EndValue = & $RegEditScriptPath -KeyPath $KeyPath -ValueName $ValueName -ValueType $ValueType -Value $Value -WorkingDirectory $WorkingDirectory -Function 'Modify' -AlsoLockDown $AlsoLockDown -ValueNameOnly $True
 
-                # } else {
+                } else {
 
                     $EndValue = & $RegEditScriptPath -KeyPath $KeyPath -ValueName $ValueName -ValueType $ValueType -Value $Value -WorkingDirectory $WorkingDirectory -Function 'Modify' -AlsoLockDown $AlsoLockDown
 
-                # }
+                }
 
             } catch {
 

@@ -195,6 +195,7 @@ Function Reg-Read{
     # Check if the key exists
     if (Test-Path $registryPath) {
 
+        
         If($ValueNameToRead -eq "") {
             Write-Log "No ValueName provided to read at key path, BUT the path was found: ($registryPath)"
             Write-Log "Function: $($MyInvocation.MyCommand.Name) | End"
@@ -343,7 +344,7 @@ function Reg-Modify {
         Write-Log ""
         Write-Log "KeyOnly: $KeyOnly"
         Write-Log ""
-        
+
         if ($KeyOnly -eq $false) {
 
             # Set the value
@@ -939,9 +940,9 @@ if ($function -ne "Read-All" -and [string]::IsNullOrWhiteSpace($KeyPath)) {
     Exit 1
 }
 
-if ($Function -eq "Modify" -and $KeyOnly -eq $false) {
+if ($Function -eq "Modify" -and $KeyOnly -eq $false -and $ValueNameOnly -eq $false) {
     if ([string]::IsNullOrWhiteSpace($Value)) {
-        Write-Log "SCRIPT: $ThisFileName | END | Value parameter is required when Function is 'Modify' and KeyOnly is false" "ERROR"
+        Write-Log "SCRIPT: $ThisFileName | END | Value parameter is required when Function is 'Modify' and KeyOnly is false and ValueNameOnly is false" "ERROR"
         Exit 1
     }
     if ([string]::IsNullOrWhiteSpace($ValueType)) {
@@ -1059,6 +1060,9 @@ if ($function -eq "Modify" -or $function -eq "Backup"){
             Write-Log "SCRIPT: $ThisFileName | END | Local registry key's path already exists as desired." "SUCCESS"
             Exit 0
 
+        } elseif ($ValueNameOnly -eq $TRue) {
+
+            
         }else {
 
             Write-Log "SCRIPT: $ThisFileName | Local registry key's value is not as desired. Will backup first." 
