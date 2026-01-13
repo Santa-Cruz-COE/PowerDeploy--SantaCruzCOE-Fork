@@ -283,6 +283,14 @@ Function Set-URL {
 
     Write-Log "Before we begin, please confirm the deployment mode."
     Write-Log ""
+    Write-Log "WHAT IS THIS?"
+    Write-Log " - Determines which repo/branch the custom script/command will pull from during use"
+    Write-Log ""
+    Write-Log "WHICH ONE SHOULD I CHOOSE?"
+    Write-Log " - To simple get a new asset in to production quickly, choose PRODUCTION"
+    Write-Log " - If you are doing any form of dev/testing, do testing in order of 1-4 as appropriate"
+    Write-Log ""
+
     #Write-Log "SCRIPT: $ThisFileName | FUNCTION: $($MyInvocation.MyCommand.Name) | START"
     #Write-Log ""
     Write-Log "Deployment Mode Options:"
@@ -292,21 +300,27 @@ Function Set-URL {
     Write-Log "1 - [PUBLIC-DEVELOPMENT]:" 
     Write-Log "     - For TESTING purposes."
     Write-Log "     - Uses official public PowerDeploy repo (DEV branch)" 
+    Write-Log "     - For testing public dev code if you are a public developer"
     Write-Log ""
 
     Write-Log "2 - [PUBLIC-TESTING]:"
     Write-Log "     - For TESTING purposes."
     Write-Log "     - Uses official public PowerDeploy repo (MAIN branch)"
+    Write-Log "     - For testing the latest code before merging it into your own repo."
     Write-Log ""
 
     Write-Log "3 - [PRIVATE-DEVELOPMENT]:"
     Write-Log "     - For TESTING purposes."
     Write-Log "     - Uses your organization's custom PowerDeploy repository (DEV branch)"
+    Write-Log "     - For testing YOUR dev code if you are a developer of your org repo."
+
     Write-Log ""
 
     Write-Log "4 - [PRODUCTION]:"
     Write-Log "     - For PRODUCTION deployments."
     Write-Log "     - Uses your organization's custom PowerDeploy repository (MAIN branch)"
+    Write-Log "     - For deploying your latest stable code from your org repo."
+    Write-Log "     - If the InTune asset is intended for production use, this is the mode to choose."
     Write-Log ""
 
     $modeSelected = $false
@@ -356,10 +370,21 @@ Function Set-URL {
                 $modeSelected1 = $true
             }
             default {
-                Write-Log "Invalid input. Please enter a number between '1' and '4'."
+                Write-Log "Invalid input. Please enter a number between '1' and '4'." "WARNING"
 
             }
 
+        }
+
+        if ($modeSelected1) {
+
+            if ($userinput -eq "3" -or $userinput -eq "4") {
+                # Verify that CustomRepoURL is set
+                if ([string]::IsNullOrWhiteSpace($CustomRepoURL)) {
+                    Write-Log "ERROR: Organization CustomRepoURL is not set in registry. Cannot proceed with PRIVATE-DEVELOPMENT or PRODUCTION mode. Please set your custom org repo by forking the public repo and then set the registry appropriately with your custom URL/token using the following function from this script: Setup--Azure-PowerDeploy_Registry_Remediations_For_Organization" "ERROR"
+                    $modeSelected1 = $False
+                }
+            }
         }
 
         if ($modeSelected1) {
@@ -2822,66 +2847,141 @@ Function Setup--Azure-PowerDeploy_Registry_Remediations_For_Organization{
     # Collect input data
 
 
-    Write-Log "Currently this function only supports updating SAS keys for Azure Blob, custom Git URL, no custom variables. Will add option for other values in the future." "WARNING"
+    # Write-Log "Currently this function only supports updating SAS keys for Azure Blob, custom Git URL, no custom variables. Will add option for other values in the future." "WARNING"
 
+    # Write-Log ""
     Write-Log ""
 
+
+    # [hashtable]$HashTable = @{}
+
+    Write-Log "=== Git Repo URL ==="
     Write-Log "Your current custom organization Git Repo URL is: $CustomRepoURL"
     Write-Log "If this is acceptable, press Enter to continue or enter the new URL now:" "WARNING"
 
-    $TempRepoURL = Read-Host "New URL, or leave blank to keep existing"
+    $TempRepoURL = Read-Host "New RepoURL, leave blank to keep existing, or type 'CLEAR' to remove"
     if ($TempRepoURL -eq "") {
         $RepoURLtoUse = $CustomRepoURL
         Write-Log "Using existing Repo URL: $RepoURLtoUse"
+    } elseif ($TempRepoURL -eq "CLEAR") {
+        $RepoURLtoUse = ""
+        Write-Log "Clearing Repo URL, setting to blank."
     } else {
         Write-Log "Using new Repo URL: $TempRepoURL"
         $RepoURLtoUse = $TempRepoURL
     }
+    # if ($RepoURLtoUse -ne "" -or $null -ne $RepoURLtoUse) {
 
+    #     $HashTable.Add("CustomRepoURL", $RepoURLtoUse)
+
+    # }
+    
+
+    Write-Log ""
+
+
+    Write-Log "=== Git Repo Token ==="
     Write-Log "Your current custom organization Git Repo Token is: $CustomRepoToken"
     Write-Log "If this is acceptable, press Enter to continue or enter the new token now:" "WARNING"
 
-    $TempRepoToken = Read-Host "New Token, or leave blank to keep existing"
+    $TempRepoToken = Read-Host "New RepoToken, leave blank to keep existing, or type 'CLEAR' to remove"
     if ($TempRepoToken -eq "") {
         $CustomRepoTokenToUse = $CustomRepoToken
         Write-Log "Using existing Repo Token: $CustomRepoTokenToUse"
+    } elseif ($TempRepoToken -eq "CLEAR") {
+        $CustomRepoTokenToUse = ""
+        Write-Log "Clearing Repo Token, setting to blank."
     } else {
         Write-Log "Using new Repo Token: $TempRepoToken"
         $CustomRepoTokenToUse = $TempRepoToken
-    }
+    } 
+    # if ($CustomRepoTokenToUse -ne "" -or $null -ne $CustomRepoTokenToUse) {
 
-
-
+    #     $HashTable.Add("CustomRepoToken", $CustomRepoTokenToUse)
+    # }
     
     Write-Log ""
-    Write-Log "Enter your custom PRINTER share SAS key:" "WARNING"
+    # Write-Log "Enter your custom PRINTER share SAS key:" "WARNING"
 
-    $PrinterContainerSASkey = Read-Host "SAS KEY"
+    # $PrinterContainerSASkey = Read-Host "SAS KEY"
+
+
+    Write-Log "=== Printer Share SAS Key ==="
+    Write-Log "Your current custom organization PRINTER share SAS key is: $PrinterContainerSASkey"
+    Write-Log "If this is acceptable, press Enter to continue or enter the new key now:" "WARNING"
+
+    $TempKey = Read-Host "New PrintSASKey, leave blank to keep existing, or type 'CLEAR' to remove"
+    if ($TempKey -eq "") {
+
+        $PrintSASKeytoUse = $PrinterContainerSASkey
+        Write-Log "Using existing Printer SAS key: $PrintSASKeytoUse"
+
+    } elseif ($TempKey -eq "CLEAR") {
+        $PrintSASKeytoUse = ""
+        Write-Log "Clearing Printer SAS key, setting to blank."
+    } else {
+        Write-Log "Using new Printer SAS key: $TempKey"
+        $PrintSASKeytoUse = $TempKey
+    }
+    # if ($PrintSASKeytoUse -ne "" -or $null -ne $PrintSASKeytoUse) {
+
+    #     $HashTable.Add("PrinterContainerSASkey", $PrintSASKeytoUse)
+    # }
 
     Write-Log ""
 
-    Write-Log "Enter your custom APPLICATION share SAS key:" "WARNING"  
+    # Write-Log "Enter your custom APPLICATION share SAS key:" "WARNING"  
 
-    $ApplicationContainerSASkey = Read-Host "SAS KEY"
+    # $ApplicationContainerSASkey = Read-Host "SAS KEY"
+
+    Write-Log "=== Application Share SAS Key ==="  
+    Write-Log "Your current custom organization APP share SAS key is: $ApplicationContainerSASkey"
+    Write-Log "If this is acceptable, press Enter to continue or enter the new key now:" "WARNING"
+
+    $TempKey = Read-Host "New ApplicationSASKey, leave blank to keep existing, or type 'CLEAR' to remove"
+    if ($TempKey -eq "") {
+
+        $ApplicationSASKeytoUse = $ApplicationContainerSASkey
+        Write-Log "Using existing Application SAS key: $ApplicationSASKeytoUse"
+
+    } elseif ($TempKey -eq "CLEAR") {
+        $ApplicationSASKeytoUse = ""
+        Write-Log "Clearing Application SAS key, setting to blank."
+    } else {
+        Write-Log "Using new Application SAS key: $TempKey"
+        $ApplicationSASKeytoUse = $TempKey
+    } 
+    # if ($ApplicationSASKeytoUse -ne "" -or $null -ne $ApplicationSASKeytoUse) {
+
+    #     $HashTable.Add("ApplicationContainerSASkey", $ApplicationSASKeytoUse)
+    # }
 
     Write-Log ""
+
+    Write-Log ""
+
+    [hashtable]$FunctionParams = $HashTable
 
     
         [hashtable]$FunctionParams = @{
-            PrinterContainerSASkey = $PrinterContainerSASkey
-            ApplicationContainerSASkey = $ApplicationContainerSASkey
+            PrinterContainerSASkey = $PrintSASKeytoUse
+            ApplicationContainerSASkey = $ApplicationSASKeytoUse
             CustomRepoToken = $CustomRepoTokenToUse
             CustomRepoURL = $RepoURLtoUse
         }
 
-        [hashtable]$ReturnHash
+        Write-Log "Attempting to generate the registry remediation scripts..."
+        Write-Log ""
+
+
+        [hashtable]$ReturnHash = @{}
 
         $ReturnHash = & $GenerateInstallCommand_ScriptPath `
         -DesiredFunction "RegRemediationScript" `
-        -RepoURL $RepoURLtoUse `
+        -RepoURL $RepoURL `
         -RepoNickName $Global:TargetRepoNickName `
         -RepoBranch $Global:RepoBranch `
-        -TargetWorkingDirectory $Global:TargetWorkingDirectory
+        -TargetWorkingDirectory $Global:TargetWorkingDirectory `
         -FunctionParams $FunctionParams
 
         # Check the returned hashtable

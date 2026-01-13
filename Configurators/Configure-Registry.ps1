@@ -24,6 +24,10 @@ Param(
 
     [string]$KeyOnly = $false, # Used to create an empty key without setting a value
 
+
+    [string]$ValueNameOnly = $False, # Used to create an empty key without setting a value
+
+    
     $AlsoLockDown = $False # Used for doing lockdown during initial creation of a key
 
     # [ValidateSet('Auto','Reg32','Reg64')]
@@ -191,6 +195,7 @@ Function Reg-Read{
     # Check if the key exists
     if (Test-Path $registryPath) {
 
+
         If($ValueNameToRead -eq "") {
             Write-Log "No ValueName provided to read at key path, BUT the path was found: ($registryPath)"
             Write-Log "Function: $($MyInvocation.MyCommand.Name) | End"
@@ -203,6 +208,16 @@ Function Reg-Read{
             $ReturnValue = $($ThisValue.$ValueNameToRead)
             Write-Log "Current value: $ReturnValue"
             Write-Log "Function: $($MyInvocation.MyCommand.Name) | End"
+
+            if ($ReturnValue -eq $null -and -not ($ThisValue.PSObject.Properties.Name -contains $ValueNameToRead)) {
+                Write-Log "Key path ($registryPath) exists, but value name at ($ValueNameToRead) does not exist"
+                Return "KeyPath exists, but ValueName does not exist"
+            }
+
+            # if ($ReturnValue -eq $null) {
+            #     Write-Log "Value name at ($ValueNameToRead) at key path ($registryPath) does not contain a value"
+            #     Return "Value not found"
+            # }
 
             Return $ReturnValue
 
@@ -315,7 +330,7 @@ function Reg-Modify {
 
         # Create the key if it doesn't exist
 
-        Write-Log "Checking if key exists at: $KeyPath"
+        Write-Log "Checking if key [$key] exists at: $KeyPath"
 
         if (-not (Test-Path $KeyPath)) {
             Write-Log "Key does not exist. Attempting to create."
@@ -336,7 +351,10 @@ function Reg-Modify {
         } else {
             Write-Log "Key already exists."
         }
-        
+        Write-Log ""
+        Write-Log "KeyOnly: $KeyOnly"
+        Write-Log ""
+
         if ($KeyOnly -eq $false) {
 
             # Set the value
@@ -913,6 +931,7 @@ Write-Log "  KeyPath: $KeyPath"
 Write-Log "  ValueName: $ValueName"
 Write-Log "  Value: $Value"       
 Write-Log "  Type: $ValueType"
+Write-Log "  KeyOnly: $KeyOnly"
 Write-log "================================="
 
 Write-Log "SCRIPT: $ThisFileName | START "
@@ -931,9 +950,9 @@ if ($function -ne "Read-All" -and [string]::IsNullOrWhiteSpace($KeyPath)) {
     Exit 1
 }
 
-if ($Function -eq "Modify" -and $KeyOnly -eq $false) {
+if ($Function -eq "Modify" -and $KeyOnly -eq $false -and $ValueNameOnly -eq $false) {
     if ([string]::IsNullOrWhiteSpace($Value)) {
-        Write-Log "SCRIPT: $ThisFileName | END | Value parameter is required when Function is 'Modify' and KeyOnly is false" "ERROR"
+        Write-Log "SCRIPT: $ThisFileName | END | Value parameter is required when Function is 'Modify' and KeyOnly is false and ValueNameOnly is false" "ERROR"
         Exit 1
     }
     if ([string]::IsNullOrWhiteSpace($ValueType)) {
@@ -957,6 +976,11 @@ if ($ReturnValue -eq "KeyPath exists, but could not read value" -or $ReturnValue
 
     Write-Log "SCRIPT: $ThisFileName | No returnable value at ($KeyPath\$ValueName): $ReturnValue" "WARNING"
     $NoFoundValue = $True
+
+} elseif ($ReturnValue -eq "Value not found") {
+
+    Write-Log "SCRIPT: $ThisFileName | The path and value name were found, but there is no value."
+
 
 } else {
 
@@ -1051,7 +1075,7 @@ if ($function -eq "Modify" -or $function -eq "Backup"){
             Write-Log "SCRIPT: $ThisFileName | END | Local registry key's path already exists as desired." "SUCCESS"
             Exit 0
 
-        }else {
+        } else {
 
             Write-Log "SCRIPT: $ThisFileName | Local registry key's value is not as desired. Will backup first." 
             
@@ -1113,10 +1137,12 @@ if ($function -eq "Modify" -or $function -eq "Backup"){
 
         }
 
-    } 
+    } else {
 
-    Write-Log "SCRIPT: $ThisFileName | END | Backup complete" "SUCCESS"
-    Exit 0
+        Write-Log "SCRIPT: $ThisFileName | END | Backup complete" "SUCCESS"
+        Exit 0
+
+    }
 
 }
 

@@ -205,14 +205,16 @@ Function RegRemediationScript {
     Write-Host ""
     # Display all the supplied parameters for the function:
     Write-Host "Function parameters received:"
+        Write-Host ""
+
     # Check the returned hashtable
-    Write-Host "StorageAccountName: $StorageAccountName"
-    Write-Host "PrinterDataJSONpath: $PrinterDataJSONpath"
-    Write-Host "PrinterContainerSASkey: $PrinterContainerSASkey"
-    Write-Host "ApplicationDataJSONpath: $ApplicationDataJSONpath"
+    Write-Host "StorageAccountName:         $StorageAccountName"
+    Write-Host "PrinterDataJSONpath:        $PrinterDataJSONpath"
+    Write-Host "PrinterContainerSASkey:     $PrinterContainerSASkey"
+    Write-Host "ApplicationDataJSONpath:    $ApplicationDataJSONpath"
     Write-Host "ApplicationContainerSASkey: $ApplicationContainerSASkey"
-    Write-Host "CustomRepoURL: $CustomRepoURL"
-    Write-Host "CustomRepoToken: $CustomRepoToken"
+    Write-Host "CustomRepoURL:              $CustomRepoURL"
+    Write-Host "CustomRepoToken:            $CustomRepoToken"
     # End display of parameters
     Write-Host ""   
     Write-Host "Generating Detect/Remediation scripts for Registry changes..." -ForegroundColor Yellow
@@ -220,6 +222,9 @@ Function RegRemediationScript {
 
         # Declare as list to bypass the Git Runner's function of putting passed string params into double quotes. This breaks the pass to the remediation script.
         $RegistryChanges = @()
+
+        # declare as string that will be parsed later
+        [string]$RegistryChangesSTRING = ""
 
         <#
         # Registry Value 1
@@ -248,21 +253,21 @@ Function RegRemediationScript {
         $ValueType = "String"
         #$Value = "$(Get-Date -Format 'yyyyMMdd_HHmmss')"
         $Value = "$StorageAccountName" # Modify this
-        $RegistryChangesSTRING = "["+"-KeyPath ""$KeyPath"" -ValueName ""$ValueName"" -ValueType ""$ValueType"" -Value ""$Value"""+"]"+","
+        $RegistryChangesSTRING += "["+"-KeyPath ""$KeyPath"" -ValueName ""$ValueName"" -ValueType ""$ValueType"" -Value ""$Value"""+"]"+","
 
         $KeyPath = "HKEY_LOCAL_MACHINE\SOFTWARE\PowerDeploy\General"
         $ValueName = "CustomRepoURL"
         $ValueType = "String"
         #$Value = "$(Get-Date -Format 'yyyyMMdd_HHmmss')"
         $Value = "$CustomRepoURL" # Modify this
-        $RegistryChangesSTRING = "["+"-KeyPath ""$KeyPath"" -ValueName ""$ValueName"" -ValueType ""$ValueType"" -Value ""$Value"""+"]"+","
+        $RegistryChangesSTRING += "["+"-KeyPath ""$KeyPath"" -ValueName ""$ValueName"" -ValueType ""$ValueType"" -Value ""$Value"""+"]"+","
 
         $KeyPath = "HKEY_LOCAL_MACHINE\SOFTWARE\PowerDeploy\General"
         $ValueName = "CustomRepoToken"
         $ValueType = "String"
         #$Value = "$(Get-Date -Format 'yyyyMMdd_HHmmss')"
         $Value = "$CustomRepoToken" # Modify this
-        $RegistryChangesSTRING = "["+"-KeyPath ""$KeyPath"" -ValueName ""$ValueName"" -ValueType ""$ValueType"" -Value ""$Value"""+"]"+","
+        $RegistryChangesSTRING += "["+"-KeyPath ""$KeyPath"" -ValueName ""$ValueName"" -ValueType ""$ValueType"" -Value ""$Value"""+"]"+","
 
 
         $KeyPath = "HKEY_LOCAL_MACHINE\SOFTWARE\PowerDeploy\Printers"
@@ -1042,6 +1047,7 @@ function UninstallApp {
 # TODO: Make this a selectable menu
 #Write-Host "Generating Intune Install Commands from function: $DesiredFunction..."
 #Write-Host ""
+Write-Host ""
 
 Write-Host "SCRIPT: $ThisFileName | DESIRED FUNCTION: $DesiredFunction | PARAMS: $FunctionParams | START"
 
