@@ -1920,7 +1920,7 @@ Function Uninstall--Local-Application{
             $TargetApp = $HashTable[[int]$TargetAppNum]
 
             Write-log "You selected to uninstall app: $TargetApp using method: CIM Win32_Product"
-            Read-Host "Is this acceptable? (Y/N)"
+            Read-Host "Is this acceptable? (y/n)"
             if ($exit -eq "y") { break }
             
 
@@ -1981,7 +1981,7 @@ Function Uninstall--Local-Application{
             $TargetApp = $HashTable.$TargetAppNum
 
             Write-Log "You selected to uninstall app: $TargetApp using method: CIM Win32_Product | Is this acceptable?" "WARNING"
-            $exit = Read-Host "(Y/N)" 
+            $exit = Read-Host "(y/n)" 
 
             if ($exit -eq "y") { break }
             
@@ -2025,7 +2025,7 @@ Function Uninstall--Local-Application{
 
 
         Write-Log "Please select an app to uninstall based on the above list:"
-
+        Write-Log ""
         $Counter = 1
         $HashTable = @{}
 
@@ -2059,22 +2059,25 @@ Function Uninstall--Local-Application{
 
         $Exit = "n"
 
+        
+
         While ($Exit -ne "y") {
 
+            [int]$TargetAppNum = 0
             Write-Log ""
-            $TargetAppNum = Read-Host "Please enter the # of the application you wish to uninstall from the above list"
+            [int]$TargetAppNum = Read-Host "Please enter the # of the application you wish to uninstall from the above list"
 
             While ($TargetAppNum -lt 1 -or $TargetAppNum -ge $COUNTER) {
 
                 Write-Log "Invalid choice. Please select a valid number from the list above." "WARNING"
-                $TargetAppNum = Read-Host "Enter the number of the app you wish to uninstall"
+                [int]$TargetAppNum = Read-Host "Enter the number of the app you wish to uninstall"
 
             }
 
             $TargetApp = $HashTable[[int]$TargetAppNum]
 
-            Write-log "You selected to uninstall app: $TargetApp. We will attempt to hit it with every uninstall method available."
-            $exit =Read-Host "Is this acceptable? (Y/N)"
+            Write-log "You selected to uninstall app: $TargetApp. We will attempt to hit it with every uninstall method available." "WARNING"
+            $exit =Read-Host "Is this acceptable? (y/n)"
             if ($exit -eq "y") { break }
             
 
@@ -2336,7 +2339,7 @@ Function Uninstall--Local-Application{
             $TargetApp = $HashTable.$TargetAppNum
 
             Write-Log "You selected to uninstall app: $TargetApp using method: $UninstallMethod | Is this acceptable?" "WARNING"
-            $exit = Read-Host "(Y/N)" 
+            $exit = Read-Host "(y/n)" 
 
             if ($exit -eq "y") { break }
             
@@ -2864,7 +2867,7 @@ function Select-ApplicationFromJSON {
             [string]$AppNameToFind = $HashTable[[int]$AppNumToFind]
 
             Write-Log "Application requested: $AppNameToFind | Is this correct?" "WARNING"
-            $exit = Read-Host "(Y/N)"
+            $exit = Read-Host "(y/n)"
 
         }
 
@@ -3117,7 +3120,7 @@ Function Select-PrinterFromJSON {
 
             Write-Log "Printer requested: $PrinterNameToFind | Is this correct?" "WARNING"
 
-            $exit = Read-Host "(Y/N)"
+            $exit = Read-Host "(y/n)"
 
         }
 
@@ -3212,6 +3215,38 @@ Function Setup--Azure-Registry_Remediations_For_Org{
 
     Write-Log ""
 
+    Write-Log "Do you need instructions on generating SAS keys for your Azure Blob Storage containers?" "WARNING"
+    $NeedInstructions = Read-Host "(y/n)"
+    While ($NeedInstructions -ne "y" -and $NeedInstructions -ne "n") {
+        Write-Log "Invalid choice. Please enter 'y' or 'n'." "ERROR"
+        $NeedInstructions = Read-Host "(y/n)"
+    }
+    Write-Log ""
+    if ($NeedInstructions -eq "y") {
+
+        Write-Log "Instructions for navigating to your Azure Blob Storage container as follows:"
+        Write-Log ""
+        Write-Log " 1 - Go to https://portal.azure.com/#view/Microsoft_Azure_StorageHub/StorageHub.MenuView/~/StorageAccountsBrowse"
+        Write-Log ""
+        Write-Log " 2 - Select this storage account: $StorageAccountName"
+        Write-Log ""
+        Write-Log " 3 - Select 'Data Storage' > 'Containers' from the left menu"
+        Write-Log ""
+        Write-Log "For each containiner that you need a SAS key for, follow these steps:"
+        Write-Log ""
+        Write-Log " 4 - Select the container from the list (e.g., applications, printers, etc.)"
+        Write-Log ""
+        Write-Log " 5 - Click the three dots (...) next to the far right of the container name and select 'Generate SAS...'"
+        Write-Log ""
+        Write-Log " 6 - In the 'Generate SAS' pane, set the appropriate date range for the key to be valid. No other default options need to be changed."
+        Write-Log ""
+        Write-Log " 7 - Click the 'Generate SAS token and URL' button at the bottom of the pane."
+        Write-Log ""
+        Write-Log " 8 - Copy the 'SAS token' value (not the full URL). You will need paste it into the appropriate prompt in the next steps of this script. You can store the SAS keys in a text document if needed."
+        Write-Log ""
+        Pause
+
+    }
 
     # Collect input data
 
@@ -3244,7 +3279,7 @@ Function Setup--Azure-Registry_Remediations_For_Org{
         Write-Log " - Leave blank to keep existing"
         Write-Log " - Type 'CLEAR' to remove existing key"
         Write-Log ""
-        $TempRepoURL = Read-Host "Enter your selection:"
+        $TempRepoURL = Read-Host "Enter your selection"
         Write-Log ""
 
         if ($TempRepoURL -eq "") {
@@ -3293,7 +3328,7 @@ Function Setup--Azure-Registry_Remediations_For_Org{
         Write-Log " - Leave blank to keep existing"
         Write-Log " - Type 'CLEAR' to remove existing key"
         Write-Log ""
-        $TempRepoToken = Read-Host "Enter your selection:"
+        $TempRepoToken = Read-Host "Enter your selection"
         Write-Log ""
         if ($TempRepoToken -eq "") {
 
@@ -3346,7 +3381,7 @@ Function Setup--Azure-Registry_Remediations_For_Org{
         Write-Log " - Leave blank to keep existing"
         Write-Log " - Type 'CLEAR' to remove existing key"
         Write-Log ""
-        $TempKey = Read-Host "Enter your selection:"
+        $TempKey = Read-Host "Enter your selection"
         Write-Log ""
 
         if ($TempKey -eq "") {
@@ -3395,7 +3430,7 @@ Function Setup--Azure-Registry_Remediations_For_Org{
         Write-Log " - Leave blank to keep existing"
         Write-Log " - Type 'CLEAR' to remove existing key"
         Write-Log ""
-        $TempKey = Read-Host "Enter your selection:"
+        $TempKey = Read-Host "Enter your selection"
         Write-Log ""
 
         if ($TempKey -eq "") {
@@ -3491,13 +3526,13 @@ Function Setup--Azure-Registry_Remediations_For_Org{
 
     Write-Log "1. In InTune, navigate to: Device > Windows > Scripts and remediations"
     Write-Log " - Direct link: https://intune.microsoft.com/#view/Microsoft_Intune_DeviceSettings/DevicesWindowsMenu/~/powershell"
-
     Write-Log ""
     Write-Log "2. Navigate to your PowerDeploy Registry Update remediation script package. If you for sure do not have one, we will walk through creating one."
-    Write-Log " - Make sure that you do not leave behind old remediation scripts in production once replace them." "WARNING"
     Write-Log ""
-
-    $Answer = Read-Host "Do you need to create a new package? (y/n)"
+    Write-Log "NOTE: Make sure that you do not leave behind old remediation scripts in production once replace them." "WARNING"
+    Write-Log ""
+    Write-Log "Do you need to create a new package?" "WARNING"
+    $Answer = Read-Host "(y/n)"
 
     if ($Answer -eq "y"){
 
@@ -3576,9 +3611,9 @@ Function Setup--Azure-Registry_Remediations_For_Org{
 # Write-Log "NOTE: Instructions and required info will be in Cyan. Please note these lines."
 # Write-Log ""
 Write-Log ""
-Write-Log "========================"
-Write-Log "===== Set Up Asset ====="
-Write-Log "========================"
+Write-Log "=================================="
+Write-Log "========== Set Up Asset =========="
+Write-Log "=================================="
 Write-Log ""
 Write-Log "Welcome! This script can be used to:"
 Write-Log " - Install a printer/app on your local machine"
@@ -3731,7 +3766,7 @@ if ($gitURL -match [regex]::Escape($CustomRepoURL) -and $CustomRepoURL -ne "" -a
 
 
 Write-Log "=================================="
-Write-Log "============ UPDATES ============"
+Write-Log "============ UPDATES ============="
 Write-Log "=================================="
 Write-Log ""
 Write-Log "Current Git Repo info:"
@@ -3795,10 +3830,19 @@ Write-Log "Pre-reqs check complete."
 Write-Log ""
 
 clear
-
-Write-Log "================================="
+Write-Log "==============================================="
+Write-Log "============== PowerDeploy Setup =============="
+Write-Log "==============================================="
 Write-Log ""
-Write-Log "These are the functions currently available through this script:"
+Write-Log "Info:"
+Write-Log ""
+Write-Log " - Operational Mode: $PerceivedMode"
+Write-Log " - Commit Version: $gitCommit"
+Write-Log ""
+Write-Log "==============================================="
+Write-Log ""
+#Write-Log "These are the functions currently available through this script:"
+Write-Log "Available Functions:"
 Write-Log ""
 
 $methods = Get-Command -CommandType Function -Name "*--*" | Select-Object -ExpandProperty Name
@@ -3814,8 +3858,8 @@ $methods | ForEach-Object {
     $Counter++ 
 
 }
-
-Write-Log "================================="
+Write-Log ""
+Write-Log "==============================================="
 Write-Log ""
 
 Write-Log "Enter the # of your desired function:" "WARNING"
@@ -3833,10 +3877,10 @@ $SelectedFunction = $AvailableFunctions[$SelectedFunctionNumber]
 Write-Log ""
 Write-Log "You have selected: $SelectedFunction"
 Write-Log ""
-Write-Log "================================="
+Write-Log "==============================================="
 Write-Log ""
 & $SelectedFunction
-Write-Log "================================="
+Write-Log "==============================================="
 Write-Log ""
 Write-Log "SCRIPT: $LocalFileName | END | Function $SelectedFunction complete" "SUCCESS"
 Exit 0
