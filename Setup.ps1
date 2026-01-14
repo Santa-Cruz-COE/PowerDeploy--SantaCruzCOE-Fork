@@ -54,6 +54,8 @@ $LogPath = "$LogRoot\$ThisFileName._Log_$(Get-Date -Format 'yyyyMMdd_HHmmss').lo
 
 $WorkingDirectory = (Split-Path $PSScriptRoot -Parent)
 $RepoRoot = $PSScriptRoot
+$LocalRepoPath = $RepoRoot
+$ThisRepoNickName = (Split-Path $PSScriptRoot -leaf)
 
 # path of WinGet installer
 $WinGetInstallerScript = "$RepoRoot\Installers\General_WinGet_Installer.ps1"
@@ -83,6 +85,8 @@ $UninstallApp_ScriptPath = "$RepoRoot\Uninstallers\General_Uninstaller.ps1"
 $InstallWinGet_ScriptPath = "$RepoRoot\Installers\Install-WinGet.ps1"
 # Path to app detect script
 $AppDetect_ScriptPath = "$RepoRoot\Templates\Detection-Script-Application_TEMPLATE.ps1"
+# Path to Git Runner template
+$GitRunnerTemplate_ScriptPath = "$RepoRoot\Templates\Git-Runner_TEMPLATE.ps1"
 
 $PublicJSONpath = "$RepoRoot\Templates\ApplicationData_TEMPLATE.json"
 
@@ -3188,7 +3192,7 @@ Try{
 
 # Update this repo
 # TODO: This isn't working quite yet. Need to add auth too.
-<#
+Clear
 Write-Log "Would you like to update the repo to the latest version? (y/n)" "WARNING"
 $Answer = Read-Host "y/n"
 if ($Answer -ne "y" -and $Answer -ne "n") {
@@ -3198,23 +3202,38 @@ if ($Answer -ne "y" -and $Answer -ne "n") {
 
 If ($Answer -eq "y"){
 
-
     Push-Location $RepoRoot
 
     Write-Log "Updating local repo located at: $RepoRoot" "INFO2"
 
+    Write-Log "Dot sourcing Git Runner template script located at: $GitRunnerTemplate_ScriptPath" "INFO2"
+    . $GitRunnerTemplate_ScriptPath -RepoURL "ZZ" -RepoNickName $ThisRepoNickName -WorkingDirectory $WorkingDirectory 
+
+    Write-Log "Running Git pre-reqs" "INFO2"
+    Write-Log "" "INFO2"
+
+    
+    CheckAndInstall-Git
+    Set-GitSafeDirectory
+
+    Write-Log "" "INFO2"
+
+
+    Write-Log "Running Git Pull to update the repo..." "INFO2"
+
     $gitOutput = git pull 2>&1
     ForEach ($line in $gitOutput) { Write-Log "GIT: $line" } ; if ($LASTEXITCODE -ne 0) {Write-Log "++++++++++++++++++++++"; Write-Log "SCRIPT: $ThisFileName | END | Failed" "ERROR"; Exit 1 }
     
-
-    # Write-Log "" "INFO2"
+    Write-Log "" "INFO2"
  
-    # Write-Log "Repo updated to the latest version." "INFO2"
+    Write-Log "Repo updated to the latest version."
+    Pause
+    Pop-Location 
      
 } 
 
 Write-Log "" "INFO2"
-#>
+
 
 
 
