@@ -1,5 +1,15 @@
 
-<img width="2083" height="1718" alt="powerdeploy_logo_white_bg" src="https://github.com/user-attachments/assets/fe2d39b3-1500-4629-94c8-6f08702f1e84" />
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/38b2e30d-dd82-4681-a18a-4e7c96e23d9b" />
+</p>
+
+
+#
+
+
+<img width="4167" height="1042" alt="powerdeploy_banner_transparent" src="https://github.com/user-attachments/assets/9771a0f8-0b5a-4c8c-b7c9-e45499cdb9c8" />
+
+
 
 # PowerDeploy
 
