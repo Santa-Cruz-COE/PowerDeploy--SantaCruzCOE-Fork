@@ -1,12 +1,4 @@
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/38b2e30d-dd82-4681-a18a-4e7c96e23d9b" />
-</p>
-
-
-#
-
-
 <img width="4167" height="1042" alt="powerdeploy_banner_transparent" src="https://github.com/user-attachments/assets/9771a0f8-0b5a-4c8c-b7c9-e45499cdb9c8" />
 
 
@@ -401,3 +393,9 @@ For issues and feature requests, please use the [GitHub Issues](https://github.c
 **NOTE**
 
 This writeup was written by AI and is just for proof of concept purposes.
+
+#
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/38b2e30d-dd82-4681-a18a-4e7c96e23d9b" />
+</p>
