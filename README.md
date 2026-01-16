@@ -23,7 +23,7 @@ PowerDeploy is specifically architected for deployment through enterprise tools 
 - **Windows Features** — Enable/disable Windows Optional Features programmatically
 - **Registry Management** — Secure registry operations with ACL management and 32/64-bit redirection handling
 - **Git-Based Deployment** — Pull latest scripts from repositories and execute on target machines
-- 
+
 
 ## Why PowerDeploy?
 
