@@ -48,14 +48,15 @@
 
 
 $LocalFileName = $MyInvocation.MyCommand.Name
-$LogRoot = "$WorkingDirectory\Logs\Setup_Logs"
 
-$LogPath = "$LogRoot\$LocalFileName._Log_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
 
 $WorkingDirectory = (Split-Path $PSScriptRoot -Parent)
 $RepoRoot = $PSScriptRoot
 $LocalRepoPath = $RepoRoot
 $ThisRepoNickName = (Split-Path $PSScriptRoot -leaf)
+
+$LogRoot = "$WorkingDirectory\Logs\Setup_Logs"
+$LogPath = "$LogRoot\$LocalFileName._Log_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
 
 # path of WinGet installer
 $WinGetInstallerScript = "$RepoRoot\Installers\General_WinGet_Installer.ps1"
