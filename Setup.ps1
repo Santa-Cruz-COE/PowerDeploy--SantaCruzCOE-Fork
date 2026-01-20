@@ -708,7 +708,9 @@ function Setup--Azure-Printer{
             PrinterName = $PrinterName
         }
 
-        $ReturnHash2 = & $GenerateInstallCommand_ScriptPath -DesiredFunction "InstallPrinterByIP" -RepoURL $RepoURL -RepoNickName $Global:TargetRepoNickName -RepoBranch $Global:RepoBranch -TargetWorkingDirectory $Global:TargetWorkingDirectory-FunctionParams $FunctionParams
+
+
+        $ReturnHash2 = & $GenerateInstallCommand_ScriptPath -DesiredFunction "InstallPrinterByIP" -RepoURL $RepoURL -RepoNickName $Global:TargetRepoNickName -RepoBranch $Global:RepoBranch -TargetWorkingDirectory $Global:TargetWorkingDirectory -FunctionParams $FunctionParams
 
         # Check the returned hashtable
         if(($ReturnHash2 -eq $null) -or ($ReturnHash2.Count -eq 0)){
@@ -825,8 +827,9 @@ function Setup--Azure-Printer{
     Write-Log " 3 - APP INFORMATION:"
     write-log "     - Name: follow your org naming conventions."
     Write-Log "         - What I recommend: ""$PotentialPrinterInTuneName"""
-    Write-Log "     - Description: Include printer name, IP, driver version, location, etc following a common naming convention for you organization."
+    Write-Log "     - Description: I recommend including printer name, IP, driver version, location, etc following a common convention for you organization."
     Write-Log "     - Publisher: Your organization name"
+    Write-Log "     - Category: Printers (Create this category if you do not already have, it will take some time to show up: https://learn.microsoft.com/en-us/intune/intune-service/apps/apps-add#create-and-edit-categories-for-apps)"
     Write-Log "     - Logo: Optional - You could create something with Canva using your organization logo, but standardize it"
     Write-Log ""   
     Pause
@@ -1531,9 +1534,10 @@ Function Setup--Azure-WindowsApp{
     write-log "     - Name: follow your org naming conventions"
     Write-Log "         - What I recommend: ""$PotentialAppInTuneName"""
 
-    Write-Log "     - Description: Up to your descretion. Copying the description from Windows Store, App website, etc could be beneficial.,"
+    Write-Log "     - Description: Up to your descretion. Copying the description from Windows Store, App website, etc could be beneficial."
     Write-Log "     - Publisher: Look up the publisher if you are not sure. You can check the Windows Store, app website, etc."
-    Write-Log "     - Version: Recommend to leave blank unless you are using a static MSI installer with a set version.."
+    Write-Log "     - Version: Recommend to leave blank unless you are using a static MSI installer with a set version."
+    Write-Log "     - Category: Choose an existing category or create a new one here: https://learn.microsoft.com/en-us/intune/intune-service/apps/apps-add#create-and-edit-categories-for-apps"
     Write-Log "     - Logo: Optional - You could create something with Canva using your organization logo, but standardize it"
     Write-Log "     - Everything else on this page is up to your discretion."
     Write-Log ""
@@ -3631,7 +3635,7 @@ Write-Log ""
 # Warnings
 Write-Log ""
 # If this script is not being ran against C:ProgramData\PowerDeploy, it is going to lock down files in the root of the repo parent folder. Give a big fat warning. 
-if ($WorkingDirectory -ne "C:\ProgramData\PowerDeploy") {
+if ($WorkingDirectory -notmatch "C:\ProgramData\PowerDeploy") {
     Write-Log "You are running this script from a non-standard location: $WorkingDirectory" "WARNING"
     Write-Log "This may cause permission issues with files created in the this folder. It is recommended to run this script from C:\ProgramData\PowerDeploy" "WARNING"
     Write-Log "" "WARNING"
