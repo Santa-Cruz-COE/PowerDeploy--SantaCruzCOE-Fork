@@ -3717,10 +3717,11 @@ Push-Location $RepoRoot
     Write-Log "Dot sourcing Git Runner template script located at: $GitRunnerTemplate_ScriptPath" "INFO2"
 
     & { # Run in a script block to avoid scope issues. Using ZZ as a dummy value for RepoURL since we are only updating local repo. Not the cleanest way to do this but it works for now. TODO: Clean up this method in the future.
-        . $GitRunnerTemplate_ScriptPath -RepoURL "ZZ" -RepoNickName $ThisRepoNickName -WorkingDirectory $WorkingDirectory -UpdateLocalRepoOnly $true
+        . $GitRunnerTemplate_ScriptPath -RepoURL "ZZ" -RepoNickName $ThisRepoNickName -WorkingDirectory $WorkingDirectory -UpdateLocalRepoOnly $true -StashChanges $False
 
         CheckAndInstall-Git
         Set-GitSafeDirectory
+
     }
 
     Write-Log "Running Git pre-reqs" "INFO2"
@@ -3773,7 +3774,7 @@ if ($GitURL_FORMATTED -like "*$CustomRepoURL_FORMATTED*" -and $CustomRepoURL_FOR
         $PerceivedMode = "???"
     }
 
-} elseif ($gitURL -like "$OfficialPublicRepoURL") {
+} elseif ($gitURL -like "*$OfficialPublicRepoURL*") {
 
     if ($gitBranch -eq "Dev"){
 
@@ -3818,8 +3819,10 @@ if ($gitCommit -eq $gitCommitRemote) {
 
 
     # Write-Log "NOTE: Operational mode indicates which version of the code this currently repo is using."
+    Write-Log "NOTE: If you have made local changes to any files in the repo, they will be stashed prior to updating." "WARNING"
     Write-Log ""
     Write-Log "Would you like to update the repo to the latest version?" "WARNING"
+
     $Answer = Read-Host "y/n"
     if ($Answer -ne "y" -and $Answer -ne "n") {
         Write-Log "Invalid input. Please type 'y' to update or 'n' to skip." "ERROR"
