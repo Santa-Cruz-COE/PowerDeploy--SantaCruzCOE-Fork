@@ -1305,46 +1305,75 @@ Function Setup--Azure-WindowsApp{
 
     }
 
-    if ($InstallMethod -eq "WinGet" -or $DetectMethod -eq "WinGet") {
+    If ($DetectMethod -eq $null -or ($DetectMethod -eq "")) {
 
-        if($WinGetID -eq $null -or $WinGetID -eq ""){
-            Write-Log "The application '$ApplicationName' does not have a WinGet ID specified in the JSON. Please update your JSON with the required fields and re-run this setup process for automatic generation." "ERROR"
+        Write-Log "The application '$ApplicationName' does not have information for the DetectMethod var in the JSON to auto-generate install command and detection script. This script will automatically choose a detect method based on the install method." "WARNING"
+
+    
+
+        if ($InstallMethod -eq "WinGet") {
+
+            if($WinGetID -eq $null -or $WinGetID -eq ""){
+                Write-Log "The application '$ApplicationName' does not have a WinGet ID specified in the JSON. Please update your JSON with the required fields and re-run this setup process for automatic generation." "ERROR"
+                Exit 1
+            }
+
+            [hashtable]$FunctionParams = @{
+                ApplicationName = $ApplicationName
+                AppID = $WinGetID
+                DetectMethod = "WinGet"
+            }
+
+            Write-log "Detect method set as WinGet" "INFO2"
+
+        } elseif ($InstallMethod -eq "MSI-Private-AzureBlob") {
+
+            if ($DisplayName -eq $null -or $DisplayName -eq "") {
+                Write-Log "The application '$ApplicationName' does not have a Display Name specified in the JSON. Please update your JSON with the required fields and re-run this setup process for automatic generation." "ERROR"
+                Exit 1
+            }
+
+            [hashtable]$FunctionParams = @{
+                ApplicationName = $ApplicationName
+                DisplayName = $DisplayName
+                DetectMethod = "MSI_Registry"
+            }
+
+            Write-Log "Detect method set as MSI_Registry" "INFO2"
+
+        } elseif ($InstallMethod -eq "EXE-Private-AzureBlob") {
+
+            if ($DisplayName -eq $null -or $DisplayName -eq "") {
+                Write-Log "The application '$ApplicationName' does not have a Display Name specified in the JSON. Please update your JSON with the required fields and re-run this setup process for automatic generation." "ERROR"
+                Exit 1
+            }
+
+            [hashtable]$FunctionParams = @{
+                ApplicationName = $ApplicationName
+                DisplayName = $DisplayName
+                DetectMethod = "MSI_Registry"
+            }
+
+            Write-Log "Detect method set as MSI_Registry" "INFO2"
+
+        } else {
+
+            Write-Log "Unknown Install Method or missing Detect Method. Please correct this in the JSON and re-run this setup process." "ERROR"
+            Write-Log "Install Method: $InstallMethod" 
+            Write-Log "Detect Method: $DetectMethod" 
+
             Exit 1
+
         }
-
-        [hashtable]$FunctionParams = @{
-            ApplicationName = $ApplicationName
-            AppID = $WinGetID
-            DetectMethod = "WinGet"
-        }
-
-        Write-log "Detect method set as WinGet" "INFO2"
-
-    } elseif ($InstallMethod -eq "MSI-Private-AzureBlob" -or $DetectMethod -eq "MSI_Registry") {
-
-        if ($DisplayName -eq $null -or $DisplayName -eq "") {
-            Write-Log "The application '$ApplicationName' does not have a Display Name specified in the JSON. Please update your JSON with the required fields and re-run this setup process for automatic generation." "ERROR"
-            Exit 1
-        }
-
-        [hashtable]$FunctionParams = @{
-            ApplicationName = $ApplicationName
-            DisplayName = $DisplayName
-            DetectMethod = "MSI_Registry"
-        }
-
-        Write-Log "Detect method set as MSI_Registry" "INFO2"
-
-    } else {
-
-        Write-Log "Unknown Install Method or missing Detect Method. Please correct this in the JSON and re-run this setup process." "ERROR"
-        Write-Log "Install Method: $InstallMethod" 
-        Write-Log "Detect Method: $DetectMethod" 
-
-        Exit 1
-
+    
     }
 
+
+    Write-Log "" "INFO2"
+    Write-Log "Final method results:" "INFO2"
+    Write-Log "Install Method: $InstallMethod" "INFO2"
+    Write-Log "Detect Method: $DetectMethod" "INFO2"
+    Write-Log "" "INFO2"
 
 
 
@@ -1551,7 +1580,7 @@ Function Setup--Azure-WindowsApp{
     Write-Log "     - Install command:"
     Write-Log "         - Use the install command found inside this file: $MainInstallCommandTXT"
     Write-Log "     - Uninstall command:"
-    Write-Log "         - Use the install command found inside this file: $UninstallCommandTXT"
+    Write-Log "         - Use the uninstall command found inside this file: $UninstallCommandTXT"
     Write-Log "     - Install time: 15 minutes"
     Write-Log "     - Allow available uninstall: No"
     Write-Log "     - Install behavior: System"
@@ -2505,6 +2534,7 @@ Function SearchJSONForApp {
 
             Write-Log "Found $AppNameToSearch in public JSON data." "INFO2"
             $AppData = $PublicJSONdata.applications | Where-Object { $_.ApplicationName -eq $AppNameToSearch }
+
             Write-log "Application data for $AppNameToSearch retrieved from public JSON:" "INFO2"
             $Output = ($AppData | ConvertTo-Json -Depth 10)
             
@@ -2529,14 +2559,17 @@ Function SearchJSONForApp {
 
         } elseif($list2 -contains $AppNameToSearch){
 
-            Write-Log "Confirmed valid application name: $AppNameToSearch"
+            Write-Log "Confirmed valid application name: $AppNameToSearch" "INFO2"
 
 
-            Write-Log "Found $AppNameToSearch in private JSON data."
+            Write-Log "Found $AppNameToSearch in private JSON data." "INFO2"
             $AppData = $PrivateJSONdata.applications | Where-Object { $_.ApplicationName -eq $AppNameToSearch }
 
             Write-log "Application data for $AppNameToSearch retrieved from private JSON:" "INFO2"
-            Write-Log ($AppData | ConvertTo-Json -Depth 10)
+            $Output = ($AppData | ConvertTo-Json -Depth 10)
+
+            Write-Log $Output "INFO2"
+
 
             # Record the needed data as variables for use in other functions
             # Convert the JSON values into local variables for access later

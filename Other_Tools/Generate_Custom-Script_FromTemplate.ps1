@@ -85,6 +85,7 @@ if ($TemplateScript -eq "GitRunnerScript"){
     $WorkingDirectory_DEC = '$WorkingDirectory = '+$WorkingDirectory
     $ScriptPath_DEC = '$ScriptPath = '+$ScriptPath
     $ScriptParamsBase64_DEC = '$ScriptParamsBase64 = '+$ScriptParamsBase64
+    $StashChanges_DEC = '$StashChanges = $true'
 
 
 # --- config for GitRunnerScript ---
@@ -97,6 +98,7 @@ $NewCode      = @"
     $RepoBranch_DEC
     $WorkingDirectory_DEC
     $ScriptPath_DEC
+    $StashChanges_DEC
     $ScriptParamsBase64_DEC
 
 # --- injected code end ---
