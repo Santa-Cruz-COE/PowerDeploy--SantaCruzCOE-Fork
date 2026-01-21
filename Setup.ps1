@@ -3828,13 +3828,16 @@ if ($gitCommit -eq $gitCommitRemote) {
 
         # Write-Log "Running Git Pull to update the repo..." "INFO2"
 
+        $Gitouput = git stash 2>&1
+        ForEach ($line in $gitOutput) { Write-Log "GIT: $line" } ; if ($LASTEXITCODE -ne 0) {Write-Log "++++++++++++++++++++++"; Write-Log "SCRIPT: $LocalFileName | END | Failed" "ERROR"; Exit 1 }
+
         $gitOutput = git pull 2>&1
         ForEach ($line in $gitOutput) { Write-Log "GIT: $line" } ; if ($LASTEXITCODE -ne 0) {Write-Log "++++++++++++++++++++++"; Write-Log "SCRIPT: $LocalFileName | END | Failed" "ERROR"; Exit 1 }
         
         Write-Log "" "INFO2"
     
         Write-Log "Repo updated to the latest version."
-        Pause
+        #Pause
         
     } 
 
