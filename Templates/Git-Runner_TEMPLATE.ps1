@@ -100,6 +100,8 @@ param(
     
     [boolean]$UpdateLocalRepoOnly, # If true, script exits early after just updating
 
+    [boolean]$StashChanges=$true, # If true, stashes any local changes before pulling latest commit
+
     [string]$ScriptPath, # Path from repo root to the target script
 
     [Parameter(Mandatory=$true)]
@@ -539,17 +541,23 @@ if(Test-Path $LocalRepoPath){
     Write-Log "Pulling latest changes..."
     try {
 
-        $gitOutput = git stash 2>&1 # Just in case there are local changes from a local admin or something
-        foreach ($line in $gitOutput) {
-            Write-Log "GIT: $line"
-        }
+        if ($StashChanges -eq $true) {
 
-        if ($LASTEXITCODE -ne 0) {
-            Write-Log "++++++++++++++++++++++"
-            Write-Log "SCRIPT: $ThisFileName | END | Failed at: git stashed." "ERROR"
-            Exit 1            
-        } else {
-            Write-Log "Successfully ran git stash" "SUCCESS"
+            Write-Log "Stashing any local changes before pulling latest commit..."
+
+            $gitOutput = git stash 2>&1 # Just in case there are local changes from a local admin or something
+            foreach ($line in $gitOutput) {
+                Write-Log "GIT: $line"
+            }
+
+            if ($LASTEXITCODE -ne 0) {
+                Write-Log "++++++++++++++++++++++"
+                Write-Log "SCRIPT: $ThisFileName | END | Failed at: git stashed." "ERROR"
+                Exit 1            
+            } else {
+                Write-Log "Successfully ran git stash" "SUCCESS"
+            }
+
         }
 
         $gitOutput = git pull 2>&1 # TODO: Need to add timeout and backup plan! Sometimes it gets frozen here. Maybe add functionality to just do a manual download.
