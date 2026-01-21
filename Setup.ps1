@@ -253,6 +253,16 @@ function Write-Log {
         [string]$Message,
         [string]$Level = "INFO"
     )
+
+    # Ensure log directory exists
+    $logDir = Split-Path $LogPath -Parent
+    if (!(Test-Path $logDir)) {
+       #Write-Host "Creating log directory at $logDir" -ForegroundColor Green
+        New-Item -ItemType Directory -Path $logDir -Force | Out-Null
+    }
+    
+
+
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     
     if ($Level -eq "INFO2") {
@@ -260,7 +270,6 @@ function Write-Log {
     } else {
         $logEntry = "[$timestamp] [$Level] $Message"
     }
-
     
     
     switch ($Level) {
@@ -274,12 +283,7 @@ function Write-Log {
         default   { Write-Host $logEntry }
     }
     
-    # Ensure log directory exists
-    $logDir = Split-Path $LogPath -Parent
-    if (!(Test-Path $logDir)) {
-        New-Item -ItemType Directory -Path $logDir -Force | Out-Null
-    }
-    
+
     Add-Content -Path $LogPath -Value $logEntry
 }
 
@@ -3537,12 +3541,12 @@ Function Setup--Azure-Registry_Remediations_For_Org{
     Write-Log ""
     Write-Log "NOTE: Make sure that you do not leave behind old remediation scripts in production once replace them." "WARNING"
     Write-Log ""
-    Write-Log "Do you need to create a new package?" "WARNING"
+    Write-Log "Do you need to create a new Remediation Script package entry in InTune?" "WARNING"
     $Answer = Read-Host "(y/n)"
 
     if ($Answer -eq "y"){
 
-        Write-Log "  To create a new package..."
+        Write-Log "  To create a new entry..."
             Write-Log ""
 
         write-Log "   1. Click ""Create"""
@@ -3637,7 +3641,8 @@ Write-Log ""
 Write-Log ""
 # If this script is not being ran against C:ProgramData\PowerDeploy, it is going to lock down files in the root of the repo parent folder. Give a big fat warning. 
 # $WorkingDirectory = "C:\ProgramData\PowerDeploy"
-if ($WorkingDirectory -notmatch "C:\\ProgramData\\PowerDeploy") {
+if ($WorkingDirectory -notlike "C:\\ProgramData\\PowerDeploy*"){
+
     Write-Log "You are running this script from a non-standard location: $WorkingDirectory" "WARNING"
     Write-Log "This may cause permission issues with files created in the this folder. It is recommended to run this script from C:\ProgramData\PowerDeploy" "WARNING"
     Write-Log "" "WARNING"
