@@ -93,7 +93,7 @@ $PublicJSONpath = "$RepoRoot\Templates\ApplicationData_TEMPLATE.json"
 
 $MyCompanyRepoURL = ""
 $MyCompanyRepoURLTOKEN = ""
-$OfficialPublicRepoURL = "https://github.com/Santa-Cruz-COE/PowerDeploy"
+$OfficialPublicRepoURL = "github.com/Santa-Cruz-COE/PowerDeploy"
 $Global:TargetRepoNickName = ""
 $Global:TargetWorkingDirectory = ""
 $Global:DeployMode = "" 
@@ -3641,7 +3641,7 @@ Write-Log ""
 Write-Log ""
 # If this script is not being ran against C:ProgramData\PowerDeploy, it is going to lock down files in the root of the repo parent folder. Give a big fat warning. 
 # $WorkingDirectory = "C:\ProgramData\PowerDeploy"
-if ($WorkingDirectory -notlike "C:\\ProgramData\\PowerDeploy*"){
+if ($WorkingDirectory -notlike "C:\ProgramData\PowerDeploy*"){
 
     Write-Log "You are running this script from a non-standard location: $WorkingDirectory" "WARNING"
     Write-Log "This may cause permission issues with files created in the this folder. It is recommended to run this script from C:\ProgramData\PowerDeploy" "WARNING"
@@ -3751,9 +3751,18 @@ Push-Location $RepoRoot
 Clear
 
 # Determine the deploy mode
+Try{
 
+    $GitURL_FORMATTED = ($GitURL -split 'github')[1]
+    $CustomRepoURL_FORMATTED = ($CustomRepoURL -split 'github')[1]
+
+} catch {
+
+    Write-Log "Error attempted to format URL's for analyzing: $_" "ERROR"
+
+}
 # if $gitURL contains the CustomRepoURL, then this is a custom org deployment
-if ($gitURL -match [regex]::Escape($CustomRepoURL) -and $CustomRepoURL -ne "" -and $CustomRepoURL -ne $null) {
+if ($GitURL_FORMATTED -like "*$CustomRepoURL_FORMATTED*" -and $CustomRepoURL_FORMATTED -ne "" -and $CustomRepoURL_FORMATTED -ne $null) {
 
     if ($gitBranch -eq "Dev"){
 
@@ -3764,7 +3773,7 @@ if ($gitURL -match [regex]::Escape($CustomRepoURL) -and $CustomRepoURL -ne "" -a
         $PerceivedMode = "???"
     }
 
-} elseif ($gitURL -match "$OfficialPublicRepoURL") {
+} elseif ($gitURL -like "$OfficialPublicRepoURL") {
 
     if ($gitBranch -eq "Dev"){
 
@@ -3838,6 +3847,8 @@ if ($gitCommit -eq $gitCommitRemote) {
     
         Write-Log "Repo updated to the latest version."
         #Pause
+
+        $Updated = $True
         
     } 
 
@@ -3856,6 +3867,11 @@ Write-Log "==============================================="
 Write-Log ""
 Write-Log "Info:"
 Write-Log ""
+if ($Updated) {
+    Write-Log " - Repo was updated to latest version."
+} else {
+    Write-Log " - No new updates found."
+}
 Write-Log " - Operational Mode: $PerceivedMode"
 Write-Log " - Commit Version: $gitCommit"
 Write-Log ""
